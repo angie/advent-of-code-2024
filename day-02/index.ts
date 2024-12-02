@@ -16,6 +16,17 @@ function getReports(data: string): Array<Array<number>> {
   return reports;
 }
 
+function isSafePair(current: number, next: number, direction: string): boolean {
+  const diff = next - current;
+
+  if (direction === "increasing") {
+    if (diff <= 0 || diff > 3) return false;
+  } else if (diff >= 0 || diff < -3) {
+    return false;
+  }
+  return true;
+}
+
 function isReportSafe(report: number[]): boolean {
   // First determine direction
   const direction = report[0] < report[1] ? "increasing" : "decreasing";
@@ -24,18 +35,47 @@ function isReportSafe(report: number[]): boolean {
   for (let i = 0; i < report.length - 1; i++) {
     const current = report[i];
     const next = report[i + 1];
-    const diff = next - current;
 
-    // For increasing sequences
-    if (direction === "increasing") {
-      if (diff <= 0 || diff > 3) return false;
-    } // For decreasing sequences
-    else {
-      if (diff >= 0 || diff < -3) return false;
+    if (!isSafePair(current, next, direction)) {
+      return false;
     }
   }
 
   return true;
+}
+
+function isReportSafeWithDampner(report: number[]): boolean {
+  // If already safe, no need to remove anything
+  if (isReportSafe(report)) return true;
+
+  // Try removing each number once
+  for (let skipIdx = 0; skipIdx < report.length; skipIdx++) {
+    // Check sequence without this number
+    let isValid = true;
+    let direction: string | null = null;
+
+    // Check all pairs except those involving the skipped number
+    for (let i = 0; i < report.length - 1; i++) {
+      if (i === skipIdx) continue;
+      let next = i + 1;
+      if (next === skipIdx) next++;
+      if (next >= report.length) break;
+
+      // Determine direction from first valid pair
+      if (direction === null) {
+        direction = report[i] < report[next] ? "increasing" : "decreasing";
+      }
+
+      if (!isSafePair(report[i], report[next], direction)) {
+        isValid = false;
+        break;
+      }
+    }
+
+    if (isValid) return true;
+  }
+
+  return false;
 }
 
 export function part1(data: string): number {
@@ -43,9 +83,10 @@ export function part1(data: string): number {
   return reports.filter(isReportSafe).length;
 }
 
-console.log("day 2, part 1");
-console.log(part1(input));
-
 export function part2(data: string): number {
-  return 0;
+  const reports = getReports(data);
+  return reports.filter(isReportSafeWithDampner).length;
 }
+
+console.log("day 2, part 2");
+console.log(part2(input));

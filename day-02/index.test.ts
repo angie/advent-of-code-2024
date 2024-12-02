@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert/equals";
-import { part1 } from "./index.ts";
+import { part1, part2 } from "./index.ts";
 
 const testInput = `7 6 4 2 1
 1 2 7 8 9
@@ -10,4 +10,8 @@ const testInput = `7 6 4 2 1
 
 Deno.test("part 1: determines whether or not reports are safe", () => {
   assertEquals(part1(testInput), 2);
+});
+
+Deno.test("part 2: determines whether or not reports are safe with dampner", () => {
+  assertEquals(part2(testInput), 4);
 });
