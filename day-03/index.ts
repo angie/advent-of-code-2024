@@ -28,34 +28,27 @@ console.log(part1(input));
 
 export function part2(data: string): number {
   const memory = getInput(data);
-  const validInstructions = [...memory.matchAll(/(mul\(\d{1,3},\d{1,3}\))/g)];
-  const enableIndices = new Set(
-    [...memory.matchAll(/(do\(\))/g)].map((e) => e.index),
-  );
-  const disableIndices = new Set(
-    [...memory.matchAll(/(don't\(\))/g)].map((d) => d.index),
-  );
+  const MUL = "mul\\(\\d{1,3},\\d{1,3}\\)";
+  const DO = "do\\(\\)";
+  const DONT = "don't\\(\\)";
+
+  const validInstructions =
+    memory.match(new RegExp(`${MUL}|${DO}|${DONT}`, "g")) ?? [];
   let total = 0;
-  let currentInstructionIdx = -1;
-  // start enabled
   let isEnabled = true;
 
   for (const instruction of validInstructions) {
-    while (currentInstructionIdx < instruction.index) {
-      currentInstructionIdx += 1;
-
-      // find latest instruction
-      if (enableIndices.has(currentInstructionIdx)) {
-        isEnabled = true;
-      }
-
-      if (disableIndices.has(currentInstructionIdx)) {
-        isEnabled = false;
-      }
+    if (instruction.match(DO)) {
+      isEnabled = true;
     }
 
-    if (isEnabled) {
-      const [a, b] = instruction[0].match(/\d+/g)?.map(Number) ?? [0, 0];
+    if (instruction.match(DONT)) {
+      isEnabled = false;
+    }
+
+    if (isEnabled && instruction.match(MUL)) {
+      const [a, b] = instruction.match(/\d+/g)?.map(Number) as Array<number> ??
+        [0, 0];
 
       total += a * b;
     }
