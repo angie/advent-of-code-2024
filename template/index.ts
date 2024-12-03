@@ -5,9 +5,15 @@ const input = await Deno.readTextFile(
 );
 
 export function part1(data: string) {
-  return false;
+  return 0;
 }
 
+// console.log("day x, part 1")
+// console.log(part1(input))
+
 export function part2(data: string) {
-  return false;
+  return 0;
 }
+
+// console.log("day x, part 2")
+// console.log(part1(input))
