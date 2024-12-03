@@ -29,8 +29,12 @@ console.log(part1(input));
 export function part2(data: string): number {
   const memory = getInput(data);
   const validInstructions = [...memory.matchAll(/(mul\(\d{1,3},\d{1,3}\))/g)];
-  const enableInstructions = [...memory.matchAll(/(do\(\))/g)];
-  const disableInstructions = [...memory.matchAll(/(don't\(\))/g)];
+  const enableIndices = new Set(
+    [...memory.matchAll(/(do\(\))/g)].map((e) => e.index),
+  );
+  const disableIndices = new Set(
+    [...memory.matchAll(/(don't\(\))/g)].map((d) => d.index),
+  );
   let total = 0;
   let currentInstructionIdx = -1;
   // start enabled
@@ -41,11 +45,11 @@ export function part2(data: string): number {
       currentInstructionIdx += 1;
 
       // find latest instruction
-      if (enableInstructions.find((e) => e.index === currentInstructionIdx)) {
+      if (enableIndices.has(currentInstructionIdx)) {
         isEnabled = true;
       }
 
-      if (disableInstructions.find((d) => d.index === currentInstructionIdx)) {
+      if (disableIndices.has(currentInstructionIdx)) {
         isEnabled = false;
       }
     }
