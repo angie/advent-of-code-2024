@@ -27,5 +27,38 @@ console.log("day 3, part 1");
 console.log(part1(input));
 
 export function part2(data: string): number {
-  return 0;
+  const memory = getInput(data);
+  const validInstructions = [...memory.matchAll(/(mul\(\d{1,3},\d{1,3}\))/g)];
+  const enableInstructions = [...memory.matchAll(/(do\(\))/g)];
+  const disableInstructions = [...memory.matchAll(/(don't\(\))/g)];
+  let total = 0;
+  let currentInstructionIdx = -1;
+  // start enabled
+  let isEnabled = true;
+
+  for (const instruction of validInstructions) {
+    while (currentInstructionIdx < instruction.index) {
+      currentInstructionIdx += 1;
+
+      // find latest instruction
+      if (enableInstructions.find((e) => e.index === currentInstructionIdx)) {
+        isEnabled = true;
+      }
+
+      if (disableInstructions.find((d) => d.index === currentInstructionIdx)) {
+        isEnabled = false;
+      }
+    }
+
+    if (isEnabled) {
+      const [a, b] = instruction[0].match(/\d+/g)?.map(Number) ?? [0, 0];
+
+      total += a * b;
+    }
+  }
+
+  return total;
 }
+
+console.log("day 3, part 2");
+console.log(part2(input));
