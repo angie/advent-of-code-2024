@@ -15,7 +15,7 @@ export function part1(data: string): number {
   let total = 0;
 
   for (const instruction of validInstructions) {
-    const [a, b] = instruction.match(/\d+/g)?.map(Number) as Array<number>;
+    const [a, b] = instruction.match(/\d+/g)?.map(Number) ?? [0, 0];
 
     total += a * b;
   }
@@ -47,8 +47,7 @@ export function part2(data: string): number {
     }
 
     if (isEnabled && instruction.match(MUL)) {
-      const [a, b] = instruction.match(/\d+/g)?.map(Number) as Array<number> ??
-        [0, 0];
+      const [a, b] = instruction.match(/\d+/g)?.map(Number) ?? [0, 0];
 
       total += a * b;
     }
