@@ -16,4 +16,4 @@ export function part2(data: string) {
 }
 
 // console.log("day x, part 2")
-// console.log(part1(input))
+// console.log(part2(input))
