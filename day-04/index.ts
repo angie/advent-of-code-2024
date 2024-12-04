@@ -65,9 +65,51 @@ export function part1(data: string) {
 console.log("day 4, part 1");
 console.log(part1(input));
 
-export function part2(data: string) {
-  return 0;
+function countXmasCrossesFromPosition(
+  grid: Grid,
+  x: number,
+  y: number,
+): number {
+  let count = 0;
+  const topLeft = [x - 1, y - 1];
+  const topRight = [x - 1, y + 1];
+  const bottomLeft = [x + 1, y - 1];
+  const bottomRight = [x + 1, y + 1];
+  try {
+    // construct diagonals
+    const diagonal1 = grid[topLeft[0]][topLeft[1]] + "A" +
+      grid[bottomRight[0]][bottomRight[1]];
+    const diagonal2 = grid[bottomLeft[0]][bottomLeft[1]] + "A" +
+      grid[topRight[0]][topRight[1]];
+
+    // check for matches
+    if (
+      (diagonal1 === "MAS" || diagonal1 === "SAM") &&
+      (diagonal2 === "MAS" || diagonal2 === "SAM")
+    ) {
+      count++;
+    }
+  } catch (_error) {
+    // a position was out of bounds, so can't be a match
+  }
+  return count;
 }
 
-// console.log("day x, part 2")
-// console.log(part1(input))
+export function part2(data: string) {
+  const grid = getWordSearchGrid(data);
+  let counter = 0;
+
+  // find all co-ordinates of middle letter "A" from which to start our search
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j] === "A") {
+        counter += countXmasCrossesFromPosition(grid, i, j);
+      }
+    }
+  }
+
+  return counter;
+}
+
+console.log("day 4, part 2");
+console.log(part2(input));
