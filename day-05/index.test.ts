@@ -34,6 +34,6 @@ Deno.test("part 1: ", () => {
   assertEquals(part1(testInput), 143);
 });
 
-Deno.test.ignore("part 2: ", () => {
-  assertEquals(part2(testInput), 0);
+Deno.test("part 2: ", () => {
+  assertEquals(part2(testInput), 123);
 });

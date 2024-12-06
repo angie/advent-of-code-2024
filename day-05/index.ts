@@ -63,28 +63,28 @@ function hasPath(
   return false;
 }
 
+function isValidOrder(
+  graph: Map<number, number[]>,
+  order: number[],
+): boolean {
+  const validPages = new Set(order);
+
+  for (let i = 0; i < order.length; i++) {
+    const currentPage = order[i];
+    for (let j = i + 1; j < order.length; j++) {
+      const laterPage = order[j];
+      // Check if later page must come before current page
+      if (hasPath(graph, laterPage, currentPage, validPages)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export function part1(data: string) {
   // process input
   const [rules, orders] = getRulesAndOrder(data);
-
-  function isValidOrder(
-    graph: Map<number, number[]>,
-    order: number[],
-  ): boolean {
-    const validPages = new Set(order);
-
-    for (let i = 0; i < order.length; i++) {
-      const currentPage = order[i];
-      for (let j = i + 1; j < order.length; j++) {
-        const laterPage = order[j];
-        // Check if later page must come before current page
-        if (hasPath(graph, laterPage, currentPage, validPages)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
 
   // check if order is valid
   const validOrders = orders.filter((order) => isValidOrder(rules, order));
@@ -98,12 +98,76 @@ export function part1(data: string) {
   }, 0);
 }
 
-console.log("day 5, part 1");
-console.log(part1(input));
-
-export function part2(data: string) {
-  return 0;
+// return a graph containing only the nodes we care about for constructing a correct order
+function getSubgraph(
+  graph: Map<number, number[]>,
+  inavlidOrder: number[],
+): Map<number, number[]> {
+  return new Map<number, number[]>(
+    inavlidOrder.map((page) => [page, graph.get(page) || []]),
+  );
 }
 
-// console.log("day x, part 2")
-// console.log(part2(input))
+function makeValid(graph: Map<number, number[]>, order: number[]): number[] {
+  // console.log("finding correct order for", order.join(","));
+  const subgraph = getSubgraph(graph, order);
+  const validOrder: number[] = [];
+  const remaining = new Set(order);
+
+  while (remaining.size > 0) {
+    // console.log("remaining to place:", Array.from(remaining.values()));
+    let placed = false;
+
+    // Try each remaining page
+    for (const page of remaining) {
+      let canPlace = true;
+
+      // Check if any other remaining page must come before it
+      for (const [before, after] of subgraph.entries()) {
+        if (remaining.has(before) && after.includes(page)) {
+          canPlace = false;
+          break; // No need to check more once we find one blocker
+        }
+      }
+
+      if (canPlace) {
+        // console.log(`${page} can be placed - nothing before it`);
+        validOrder.push(page);
+        remaining.delete(page);
+        placed = true;
+        break; // Only place one page per iteration
+      }
+    }
+
+    if (!placed) {
+      console.error("Cycle detected or invalid graph!");
+      break;
+    }
+  }
+
+  return validOrder;
+}
+
+// console.log("day 5, part 1");
+// console.log(part1(input));
+
+export function part2(data: string) {
+  // process input
+  const [rules, orders] = getRulesAndOrder(data);
+
+  // get invalid orders
+  const invalidOrders = orders.filter((order) => !isValidOrder(rules, order))
+    // then re-order them
+    .map((i) => makeValid(rules, i));
+
+  return invalidOrders.reduce((prev, curr) => {
+    // find middle element of valid order
+    const middleIdx = Math.floor(curr.length / 2);
+
+    // ... and add its value to running total
+    return prev += curr[middleIdx];
+  }, 0);
+}
+
+console.log("day 5, part 2");
+console.log(part2(input));
